@@ -69,7 +69,7 @@ function makeEventTag(item) {
   const node = eventTagTemplate.content.firstElementChild.cloneNode(true);
   node.dataset.type = item.type;
   const text = node.querySelector(".text");
-  text.textContent = item.note ? `${item.title}（${item.note}）` : item.title;
+  text.textContent = item.note ? `${item.title}（备注：${item.note}）` : item.title;
   return node;
 }
 
