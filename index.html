@@ -15,7 +15,13 @@
 
       <section class="toolbar" aria-label="日历工具栏">
         <button id="prevMonth" class="btn" type="button">← 上个月</button>
-        <h2 id="monthLabel" class="month-label"></h2>
+        <div class="month-controls">
+          <h2 id="monthLabel" class="month-label"></h2>
+          <label class="month-picker-label" for="monthPicker">
+            选择月份
+            <input id="monthPicker" class="month-picker" type="month" />
+          </label>
+        </div>
         <button id="nextMonth" class="btn" type="button">下个月 →</button>
       </section>
 

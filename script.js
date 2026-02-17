@@ -11,6 +11,7 @@ const monthLabel = document.getElementById("monthLabel");
 const calendarGrid = document.getElementById("calendarGrid");
 const prevMonthBtn = document.getElementById("prevMonth");
 const nextMonthBtn = document.getElementById("nextMonth");
+const monthPicker = document.getElementById("monthPicker");
 const eventForm = document.getElementById("eventForm");
 const eventTagTemplate = document.getElementById("eventTagTemplate");
 
@@ -75,6 +76,7 @@ function makeEventTag(item) {
 function renderCalendar() {
   const { first, mondayStartOffset, totalVisible } = getMonthRange(currentDate);
   monthLabel.textContent = formatMonthTitle(currentDate);
+  monthPicker.value = `${currentDate.getFullYear()}-${String(currentDate.getMonth() + 1).padStart(2, "0")}`;
   calendarGrid.innerHTML = "";
 
   const gridStart = new Date(first);
@@ -121,6 +123,16 @@ nextMonthBtn.addEventListener("click", () => {
   currentDate = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1);
   renderCalendar();
 });
+
+monthPicker.addEventListener("change", (event) => {
+  const value = event.target.value;
+  if (!value) return;
+
+  const [year, month] = value.split("-").map(Number);
+  currentDate = new Date(year, month - 1, 1);
+  renderCalendar();
+});
+
 
 eventForm.addEventListener("submit", (event) => {
   event.preventDefault();
