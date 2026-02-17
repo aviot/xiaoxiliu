@@ -1,10 +1,10 @@
 const STORAGE_KEY = "finance-calendar-events-v1";
 
 const seedEvents = [
-  { date: "2026-02-10", title: "1月CPI数据公布", type: "past", note: "关注通胀走势" },
-  { date: "2026-02-14", title: "央行货币政策报告", type: "past", note: "评估流动性导向" },
-  { date: "2026-02-19", title: "LPR报价发布", type: "upcoming", note: "影响房贷与企业融资成本" },
-  { date: "2026-02-26", title: "美联储会议纪要", type: "upcoming", note: "观察降息预期变化" },
+  { id: "seed-1", date: "2026-02-10", title: "1月CPI数据公布", type: "past", note: "关注通胀走势" },
+  { id: "seed-2", date: "2026-02-14", title: "央行货币政策报告", type: "past", note: "评估流动性导向" },
+  { id: "seed-3", date: "2026-02-19", title: "LPR报价发布", type: "upcoming", note: "影响房贷与企业融资成本" },
+  { id: "seed-4", date: "2026-02-26", title: "美联储会议纪要", type: "upcoming", note: "观察降息预期变化" },
 ];
 
 const monthLabel = document.getElementById("monthLabel");
@@ -18,6 +18,13 @@ const eventTagTemplate = document.getElementById("eventTagTemplate");
 let currentDate = new Date();
 let events = loadEvents();
 
+function generateEventId() {
+  if (window.crypto && typeof window.crypto.randomUUID === "function") {
+    return window.crypto.randomUUID();
+  }
+  return `event-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+}
+
 function loadEvents() {
   const raw = localStorage.getItem(STORAGE_KEY);
   if (!raw) {
@@ -26,7 +33,11 @@ function loadEvents() {
   }
   try {
     const parsed = JSON.parse(raw);
-    return Array.isArray(parsed) ? parsed : [...seedEvents];
+    if (!Array.isArray(parsed)) return [...seedEvents];
+    return parsed.map((item) => ({
+      ...item,
+      id: item.id || `${item.date}-${item.title}-${Math.random().toString(36).slice(2, 8)}`,
+    }));
   } catch {
     return [...seedEvents];
   }
@@ -68,8 +79,17 @@ function eventsByDate(dateKey) {
 function makeEventTag(item) {
   const node = eventTagTemplate.content.firstElementChild.cloneNode(true);
   node.dataset.type = item.type;
+  node.dataset.id = item.id;
   const text = node.querySelector(".text");
   text.textContent = item.note ? `${item.title}（备注：${item.note}）` : item.title;
+
+  const deleteBtn = node.querySelector(".delete-btn");
+  deleteBtn.addEventListener("click", () => {
+    events = events.filter((eventItem) => eventItem.id !== item.id);
+    saveEvents();
+    renderCalendar();
+  });
+
   return node;
 }
 
@@ -144,7 +164,7 @@ eventForm.addEventListener("submit", (event) => {
 
   if (!date || !title) return;
 
-  events.push({ date, title, type, note });
+  events.push({ id: generateEventId(), date, title, type, note });
   saveEvents();
   eventForm.reset();
 

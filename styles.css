@@ -177,6 +177,26 @@ body {
   background: var(--upcoming);
 }
 
+
+.delete-btn {
+  margin-left: auto;
+  width: 18px;
+  height: 18px;
+  border: 1px solid #d1d9e6;
+  border-radius: 999px;
+  background: #fff;
+  color: #6b7280;
+  cursor: pointer;
+  font-size: 12px;
+  line-height: 1;
+  padding: 0;
+}
+
+.delete-btn:hover {
+  color: #b91c1c;
+  border-color: #f2b4b4;
+  background: #fff5f5;
+}
 .panel {
   background: var(--card);
   border: 1px solid var(--line);

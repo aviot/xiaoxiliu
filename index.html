@@ -52,7 +52,7 @@
           </label>
           <label>
             备注（可选）
-            <input id="eventNote" type="text" maxlength="120" placeholder="无需精确到时间（可写上午/下午）" />
+            <input id="eventNote" type="text" maxlength="120" />
             <small class="field-hint">示例：上午、盘后、当周内，不用写具体几点几分。</small>
           </label>
           <button class="btn primary" type="submit">添加事件</button>
@@ -64,6 +64,7 @@
       <li class="event-tag">
         <span class="dot"></span>
         <span class="text"></span>
+        <button class="delete-btn" type="button" aria-label="删除事件" title="删除事件">×</button>
       </li>
     </template>
 
