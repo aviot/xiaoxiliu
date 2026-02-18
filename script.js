@@ -13,9 +13,13 @@ const prevMonthBtn = document.getElementById("prevMonth");
 const nextMonthBtn = document.getElementById("nextMonth");
 const monthPicker = document.getElementById("monthPicker");
 const eventForm = document.getElementById("eventForm");
+const eventDateInput = document.getElementById("eventDate");
+const eventTitleInput = document.getElementById("eventTitle");
 const eventTagTemplate = document.getElementById("eventTagTemplate");
+const formHint = document.getElementById("formHint");
 
 let currentDate = new Date();
+let selectedDateKey = "";
 let events = loadEvents();
 
 function generateEventId() {
@@ -76,6 +80,14 @@ function eventsByDate(dateKey) {
   return events.filter((item) => item.date === dateKey);
 }
 
+function updateFormHint(dateKey = "") {
+  if (!dateKey) {
+    formHint.textContent = "可点击日历中的任意日期，自动填入下方“日期”。";
+    return;
+  }
+  formHint.textContent = `已选日期：${dateKey}，请继续填写事件名称后添加。`;
+}
+
 function makeEventTag(item) {
   const node = eventTagTemplate.content.firstElementChild.cloneNode(true);
   node.dataset.type = item.type;
@@ -84,7 +96,8 @@ function makeEventTag(item) {
   text.textContent = item.note ? `${item.title}（备注：${item.note}）` : item.title;
 
   const deleteBtn = node.querySelector(".delete-btn");
-  deleteBtn.addEventListener("click", () => {
+  deleteBtn.addEventListener("click", (event) => {
+    event.stopPropagation();
     events = events.filter((eventItem) => eventItem.id !== item.id);
     saveEvents();
     renderCalendar();
@@ -113,8 +126,19 @@ function renderCalendar() {
 
     const cell = document.createElement("article");
     cell.className = "day-cell";
+    cell.dataset.date = cellDateKey;
+
     if (!isCurrentMonth) cell.classList.add("muted");
     if (cellDateKey === todayKey) cell.classList.add("today");
+    if (cellDateKey === selectedDateKey) cell.classList.add("selected");
+
+    cell.addEventListener("click", () => {
+      selectedDateKey = cellDateKey;
+      eventDateInput.value = cellDateKey;
+      updateFormHint(cellDateKey);
+      eventTitleInput.focus();
+      renderCalendar();
+    });
 
     const dateNum = document.createElement("div");
     dateNum.className = "date-num";
@@ -153,12 +177,11 @@ monthPicker.addEventListener("change", (event) => {
   renderCalendar();
 });
 
-
 eventForm.addEventListener("submit", (event) => {
   event.preventDefault();
 
-  const date = document.getElementById("eventDate").value;
-  const title = document.getElementById("eventTitle").value.trim();
+  const date = eventDateInput.value;
+  const title = eventTitleInput.value.trim();
   const type = document.getElementById("eventType").value;
   const note = document.getElementById("eventNote").value.trim();
 
@@ -168,9 +191,13 @@ eventForm.addEventListener("submit", (event) => {
   saveEvents();
   eventForm.reset();
 
+  selectedDateKey = date;
+  updateFormHint(date);
+
   const [y, m] = date.split("-").map(Number);
   currentDate = new Date(y, m - 1, 1);
   renderCalendar();
 });
 
+updateFormHint();
 renderCalendar();
