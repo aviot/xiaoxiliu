@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>10秒钟知道你的MBTI性格</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="container">
+      <section class="card">
+        <h1 class="title">10秒钟知道你的MBTI性格</h1>
+        <p class="subtitle">8题快测，点击直觉答案，马上看结果</p>
+
+        <section id="quiz-view">
+          <p class="progress" id="progress"></p>
+          <h2 class="question" id="question"></h2>
+          <div class="options" id="options"></div>
+        </section>
+
+        <section id="result-view" class="hidden">
+          <div class="result-box">
+            <p class="result-label">你的类型是</p>
+            <p class="result-type" id="result-type"></p>
+            <p class="result-desc" id="result-desc"></p>
+          </div>
+
+          <div class="score-box">
+            <p class="score-title">维度倾向</p>
+            <div id="score-lines"></div>
+          </div>
+
+          <button id="restart-btn" class="restart-btn">再测一次</button>
+        </section>
+      </section>
+    </main>
+
+    <script src="script.js"></script>
+  </body>
+</html>
