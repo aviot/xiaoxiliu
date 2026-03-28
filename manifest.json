@@ -1,0 +1,28 @@
+{
+  "manifest_version": 3,
+  "name": "金十快讯中文播报",
+  "version": "1.0.0",
+  "description": "实时朗读金十网快讯内容（中文）",
+  "permissions": [
+    "storage",
+    "tts",
+    "alarms"
+  ],
+  "host_permissions": [
+    "https://www.jin10.com/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://www.jin10.com/*"],
+      "js": ["content.js"],
+      "run_at": "document_idle"
+    }
+  ],
+  "action": {
+    "default_title": "金十快讯中文播报",
+    "default_popup": "popup.html"
+  }
+}
