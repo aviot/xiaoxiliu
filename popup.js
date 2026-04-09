@@ -7,6 +7,7 @@ const controls = {
   pitch: $('pitch'),
   volume: $('volume'),
   stop: $('stop'),
+  tips: $('tips'),
 };
 
 const LANG_LABEL = {
@@ -25,7 +26,14 @@ function send(type, payload) {
 
 function toLangLabel(lang = '') {
   const normalized = lang.trim();
-  return LANG_LABEL[normalized] || `中文语音（${normalized || '未知地区'}）`;
+  return LANG_LABEL[normalized] || (normalized ? `语言 ${normalized}` : '未知语言');
+}
+
+function optionLabel(voice, index) {
+  const langLabel = toLangLabel(voice.lang);
+  const typeLabel = voice.remote ? '云端' : '本地';
+  const group = voice.isChinese ? '中文' : '非中文';
+  return `候选语音 ${index + 1}（${group} / ${typeLabel}）：${langLabel}`;
 }
 
 function renderVoices(voiceOptions = [], selectedVoice = '') {
@@ -39,14 +47,28 @@ function renderVoices(voiceOptions = [], selectedVoice = '') {
   voiceOptions.forEach((voice, index) => {
     const option = document.createElement('option');
     option.value = voice.voiceName;
-
-    const label = toLangLabel(voice.lang);
-    option.textContent = `候选语音 ${index + 1}：${label}${voice.remote ? '（云端）' : '（本地）'}`;
-
+    option.textContent = optionLabel(voice, index);
     controls.voice.appendChild(option);
   });
 
   controls.voice.value = selectedVoice || '';
+}
+
+function renderTips(settings) {
+  if (settings.lastSpeakIssue) {
+    controls.tips.textContent = settings.lastSpeakIssue;
+    controls.tips.style.color = '#b54708';
+    return;
+  }
+
+  if (!settings.hasChineseVoice) {
+    controls.tips.textContent = '当前未发现中文语音，系统可能会读成英文。请安装系统中文语音包后重启浏览器。';
+    controls.tips.style.color = '#b54708';
+    return;
+  }
+
+  controls.tips.textContent = '打开金十网页后，插件会自动朗读新增快讯。';
+  controls.tips.style.color = '#555';
 }
 
 async function init() {
@@ -57,6 +79,7 @@ async function init() {
   controls.pitch.value = String(settings.pitch ?? 1);
   controls.volume.value = String(settings.volume ?? 1);
   renderVoices(settings.voiceOptions || [], settings.voiceName || '');
+  renderTips(settings);
 
   controls.enabled.addEventListener('change', () => {
     send('UPDATE_SETTINGS', { enabled: controls.enabled.checked });

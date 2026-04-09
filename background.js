@@ -14,6 +14,7 @@ const state = {
   dedupe: new Set(),
   dedupeOrder: [],
   settings: { ...DEFAULT_SETTINGS },
+  lastSpeakIssue: "",
 };
 
 async function loadSettings() {
@@ -43,8 +44,12 @@ function isDuplicate(fp) {
   return state.dedupe.has(fp);
 }
 
+function isChineseVoice(voice) {
+  return /zh|cmn|chinese/i.test(`${voice.lang} ${voice.voiceName}`);
+}
+
 function pickChineseVoice(voices) {
-  const zhVoices = voices.filter((v) => /zh|cmn|chinese/i.test(`${v.lang} ${v.voiceName}`));
+  const zhVoices = voices.filter((v) => isChineseVoice(v));
   if (!zhVoices.length) return null;
 
   const cnVoice = zhVoices.find((v) => /zh-CN|cmn-CN/i.test(v.lang));
@@ -67,18 +72,18 @@ async function ensureVoiceSelected() {
   if (fallback && fallback !== state.settings.voiceName) {
     await saveSettings({ voiceName: fallback });
   }
+
   return fallback;
 }
 
 async function getVoiceOptions() {
   const voices = await getVoices();
-  return voices
-    .filter((v) => /zh|cmn|chinese/i.test(`${v.lang} ${v.voiceName}`))
-    .map((v) => ({
-      voiceName: v.voiceName,
-      lang: v.lang,
-      remote: !!v.remote,
-    }));
+  return voices.map((v) => ({
+    voiceName: v.voiceName,
+    lang: v.lang,
+    remote: !!v.remote,
+    isChinese: isChineseVoice(v),
+  }));
 }
 
 function speakNext() {
@@ -88,8 +93,16 @@ function speakNext() {
   state.speaking = true;
 
   ensureVoiceSelected().then((voiceName) => {
+    if (!voiceName) {
+      state.lastSpeakIssue = "未检测到可用中文语音，请先安装系统中文语音包。";
+      state.speaking = false;
+      speakNext();
+      return;
+    }
+
+    state.lastSpeakIssue = "";
     chrome.tts.speak(text, {
-      ...(voiceName ? { voiceName } : {}),
+      voiceName,
       lang: "zh-CN",
       rate: state.settings.rate,
       pitch: state.settings.pitch,
@@ -138,7 +151,14 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
 
   if (message?.type === "GET_SETTINGS") {
     Promise.all([ensureVoiceSelected(), getVoiceOptions()]).then(([voiceName, voiceOptions]) => {
-      sendResponse({ ...state.settings, voiceName, voiceOptions });
+      const chineseVoices = voiceOptions.filter((v) => v.isChinese);
+      sendResponse({
+        ...state.settings,
+        voiceName,
+        voiceOptions,
+        hasChineseVoice: chineseVoices.length > 0,
+        lastSpeakIssue: state.lastSpeakIssue,
+      });
     });
     return true;
   }
