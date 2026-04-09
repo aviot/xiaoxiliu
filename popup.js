@@ -9,31 +9,44 @@ const controls = {
   stop: $('stop'),
 };
 
+const LANG_LABEL = {
+  'zh-CN': '普通话（中国）',
+  'zh-TW': '中文（台湾）',
+  'zh-HK': '中文（香港）',
+  cmn: '普通话',
+  'cmn-CN': '普通话（中国）',
+};
+
 function send(type, payload) {
   return new Promise((resolve) => {
     chrome.runtime.sendMessage({ type, payload }, (res) => resolve(res));
   });
 }
 
+function toLangLabel(lang = '') {
+  const normalized = lang.trim();
+  return LANG_LABEL[normalized] || `中文语音（${normalized || '未知地区'}）`;
+}
+
 function renderVoices(voiceOptions = [], selectedVoice = '') {
   controls.voice.innerHTML = '';
 
-  if (!voiceOptions.length) {
-    const option = document.createElement('option');
-    option.value = '';
-    option.textContent = '系统默认中文语音';
-    controls.voice.appendChild(option);
-    return;
-  }
+  const defaultOption = document.createElement('option');
+  defaultOption.value = '';
+  defaultOption.textContent = '系统默认中文语音（自动选择）';
+  controls.voice.appendChild(defaultOption);
 
-  voiceOptions.forEach((voice) => {
+  voiceOptions.forEach((voice, index) => {
     const option = document.createElement('option');
     option.value = voice.voiceName;
-    option.textContent = `${voice.voiceName} (${voice.lang}${voice.remote ? ' / 远程' : ''})`;
+
+    const label = toLangLabel(voice.lang);
+    option.textContent = `候选语音 ${index + 1}：${label}${voice.remote ? '（云端）' : '（本地）'}`;
+
     controls.voice.appendChild(option);
   });
 
-  controls.voice.value = selectedVoice || voiceOptions[0].voiceName;
+  controls.voice.value = selectedVoice || '';
 }
 
 async function init() {
