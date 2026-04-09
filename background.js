@@ -5,6 +5,7 @@ const DEFAULT_SETTINGS = {
   volume: 1,
   dedupeSize: 200,
   minLength: 6,
+  voiceName: "",
 };
 
 const state = {
@@ -13,7 +14,6 @@ const state = {
   dedupe: new Set(),
   dedupeOrder: [],
   settings: { ...DEFAULT_SETTINGS },
-  selectedVoiceName: null,
 };
 
 async function loadSettings() {
@@ -51,13 +51,34 @@ function pickChineseVoice(voices) {
   return cnVoice || zhVoices[0];
 }
 
-async function ensureVoiceSelected() {
-  if (state.selectedVoiceName) return state.selectedVoiceName;
+function getVoices() {
+  return new Promise((resolve) => chrome.tts.getVoices(resolve));
+}
 
-  const voices = await new Promise((resolve) => chrome.tts.getVoices(resolve));
-  const voice = pickChineseVoice(voices);
-  state.selectedVoiceName = voice ? voice.voiceName : null;
-  return state.selectedVoiceName;
+async function ensureVoiceSelected() {
+  const voices = await getVoices();
+
+  if (state.settings.voiceName) {
+    const found = voices.find((v) => v.voiceName === state.settings.voiceName);
+    if (found) return state.settings.voiceName;
+  }
+
+  const fallback = pickChineseVoice(voices)?.voiceName || "";
+  if (fallback && fallback !== state.settings.voiceName) {
+    await saveSettings({ voiceName: fallback });
+  }
+  return fallback;
+}
+
+async function getVoiceOptions() {
+  const voices = await getVoices();
+  return voices
+    .filter((v) => /zh|cmn|chinese/i.test(`${v.lang} ${v.voiceName}`))
+    .map((v) => ({
+      voiceName: v.voiceName,
+      lang: v.lang,
+      remote: !!v.remote,
+    }));
 }
 
 function speakNext() {
@@ -68,7 +89,7 @@ function speakNext() {
 
   ensureVoiceSelected().then((voiceName) => {
     chrome.tts.speak(text, {
-      voiceName,
+      ...(voiceName ? { voiceName } : {}),
       lang: "zh-CN",
       rate: state.settings.rate,
       pitch: state.settings.pitch,
@@ -100,10 +121,12 @@ function enqueueText(raw) {
 
 chrome.runtime.onInstalled.addListener(async () => {
   await loadSettings();
+  await ensureVoiceSelected();
 });
 
 chrome.runtime.onStartup.addListener(async () => {
   await loadSettings();
+  await ensureVoiceSelected();
 });
 
 chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
@@ -114,8 +137,10 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
   }
 
   if (message?.type === "GET_SETTINGS") {
-    sendResponse({ ...state.settings, voiceName: state.selectedVoiceName });
-    return;
+    Promise.all([ensureVoiceSelected(), getVoiceOptions()]).then(([voiceName, voiceOptions]) => {
+      sendResponse({ ...state.settings, voiceName, voiceOptions });
+    });
+    return true;
   }
 
   if (message?.type === "UPDATE_SETTINGS") {
@@ -131,4 +156,4 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
   }
 });
 
-loadSettings();
+loadSettings().then(ensureVoiceSelected);
