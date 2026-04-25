@@ -194,6 +194,50 @@ body.extension-popup select {
   gap: 6px;
   line-height: 1.25;
   color: #354052;
+  justify-content: space-between;
+}
+
+
+.add-event-btn {
+  align-self: flex-end;
+  border: 1px dashed #b8c8e4;
+  background: #f8fbff;
+  color: #1d4ed8;
+  border-radius: 8px;
+  font-size: 0.72rem;
+  padding: 2px 8px;
+  cursor: pointer;
+}
+
+.add-event-btn:hover {
+  background: #eef5ff;
+}
+
+.event-actions {
+  display: inline-flex;
+  gap: 4px;
+  margin-left: 6px;
+}
+
+.mini-btn {
+  border: 1px solid #d1d9e6;
+  background: #fff;
+  color: #475569;
+  border-radius: 6px;
+  font-size: 0.65rem;
+  padding: 0 6px;
+  height: 20px;
+  cursor: pointer;
+}
+
+.mini-btn:hover {
+  border-color: #94a3b8;
+}
+
+.mini-btn.danger:hover {
+  border-color: #f2b4b4;
+  color: #b91c1c;
+  background: #fff5f5;
 }
 
 .dot {

@@ -3,14 +3,14 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>财经日历（月视图）</title>
+    <title>财经日历（新标签页）</title>
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
     <main class="app">
       <header class="app-header">
-        <h1>财经日历</h1>
-        <p>按月查看：记录“已发生”与“将发生”的财经事件（不含精确时间）</p>
+        <h1>财经日历（新标签页）</h1>
+        <p>直接在日期格中新增 / 修改 / 删除事件</p>
       </header>
 
       <section class="toolbar" aria-label="日历工具栏">
@@ -25,49 +25,15 @@
         <button id="nextMonth" class="btn" type="button">下个月 →</button>
       </section>
 
+      <p class="form-hint">提示：点击某一天右下角“+ 添加”，或在已有事件上点“编辑/删除”。</p>
+
       <section class="calendar-wrapper">
         <div class="weekdays" aria-hidden="true">
           <span>周一</span><span>周二</span><span>周三</span><span>周四</span><span>周五</span><span>周六</span><span>周日</span>
         </div>
         <div id="calendarGrid" class="calendar-grid" role="grid" aria-label="财经月历"></div>
       </section>
-
-      <section class="panel">
-        <h3>新增事件</h3>
-        <p id="formHint" class="form-hint">可点击日历中的任意日期，自动填入下方“日期”。</p>
-        <form id="eventForm" class="event-form">
-          <label>
-            日期
-            <input id="eventDate" type="date" required />
-          </label>
-          <label>
-            事件名称
-            <input id="eventTitle" type="text" maxlength="50" placeholder="例如：美联储议息会议" required />
-          </label>
-          <label>
-            分类
-            <select id="eventType">
-              <option value="upcoming">将发生</option>
-              <option value="past">已发生</option>
-            </select>
-          </label>
-          <label>
-            备注（可选）
-            <input id="eventNote" type="text" maxlength="120" />
-            <small class="field-hint">示例：上午、盘后、当周内，不用写具体几点几分。</small>
-          </label>
-          <button class="btn primary" type="submit">添加事件</button>
-        </form>
-      </section>
     </main>
-
-    <template id="eventTagTemplate">
-      <li class="event-tag">
-        <span class="dot"></span>
-        <span class="text"></span>
-        <button class="delete-btn" type="button" aria-label="删除事件" title="删除事件">×</button>
-      </li>
-    </template>
 
     <script src="script.js"></script>
   </body>

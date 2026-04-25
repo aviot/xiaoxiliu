@@ -1,10 +1,12 @@
 {
   "manifest_version": 3,
   "name": "财经日历插件",
-  "description": "按月记录已发生和将发生的财经事件。",
-  "version": "1.0.0",
+  "description": "在新标签页按月管理财经事件，支持直接在日期格新增/修改/删除。",
+  "version": "1.1.0",
+  "chrome_url_overrides": {
+    "newtab": "index.html"
+  },
   "action": {
-    "default_title": "财经日历",
-    "default_popup": "popup.html"
+    "default_title": "财经日历"
   }
 }
