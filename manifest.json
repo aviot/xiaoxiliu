@@ -1,0 +1,10 @@
+{
+  "manifest_version": 3,
+  "name": "财经日历插件",
+  "description": "按月记录已发生和将发生的财经事件。",
+  "version": "1.0.0",
+  "action": {
+    "default_title": "财经日历",
+    "default_popup": "popup.html"
+  }
+}
