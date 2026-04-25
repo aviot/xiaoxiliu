@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>财经日历（新标签页）</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="app">
+      <header class="app-header">
+        <h1>财经日历（新标签页）</h1>
+        <p>直接在日期格中新增 / 修改 / 删除事件</p>
+      </header>
+
+      <section class="toolbar" aria-label="日历工具栏">
+        <button id="prevMonth" class="btn" type="button">← 上个月</button>
+        <div class="month-controls">
+          <h2 id="monthLabel" class="month-label"></h2>
+          <label class="month-picker-label" for="monthPicker">
+            选择月份
+            <input id="monthPicker" class="month-picker" type="month" />
+          </label>
+        </div>
+        <button id="nextMonth" class="btn" type="button">下个月 →</button>
+      </section>
+
+      <p class="form-hint">提示：点击某一天右下角“+ 添加”，或在已有事件上点“编辑/删除”。</p>
+
+      <section class="calendar-wrapper">
+        <div class="weekdays" aria-hidden="true">
+          <span>周一</span><span>周二</span><span>周三</span><span>周四</span><span>周五</span><span>周六</span><span>周日</span>
+        </div>
+        <div id="calendarGrid" class="calendar-grid" role="grid" aria-label="财经月历"></div>
+      </section>
+    </main>
+
+    <script src="script.js"></script>
+  </body>
+</html>
